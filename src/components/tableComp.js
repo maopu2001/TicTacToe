@@ -4,26 +4,15 @@ import Circle from "./png/circle.png";
 import Cross from "./png/cross.png";
 import { startingPlayer } from "./chooseSignComp.js";
 
+const CircleColor = "#f7a5a6";
+const CrossColor = "#85c0ea";
+const DrawColor = "#c7c7c7";
+
 class TableComp extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      player: "",
-      winner: "",
-      cells: {
-        c11: "",
-        c12: "",
-        c13: "",
-        c21: "",
-        c22: "",
-        c23: "",
-        c31: "",
-        c32: "",
-        c33: "",
-      },
-    };
-
-    this.initialState = this.state;
+    this.player = "";
+    this.winner = "";
   }
 
   render() {
@@ -39,35 +28,35 @@ class TableComp extends Component {
             <tbody>
               <tr>
                 <td onClick={() => this.update_cell("c11")}>
-                  <img id="c11" src="" name={this.state.cells.c11} alt="" />
+                  <img id="c11" src="" name="" alt="" />
                 </td>
                 <td onClick={() => this.update_cell("c12")}>
-                  <img id="c12" src="" name={this.state.cells.c12} alt="" />
+                  <img id="c12" src="" name="" alt="" />
                 </td>
                 <td onClick={() => this.update_cell("c13")}>
-                  <img id="c13" src="" name={this.state.cells.c13} alt="" />
+                  <img id="c13" src="" name="" alt="" />
                 </td>
               </tr>
               <tr>
                 <td onClick={() => this.update_cell("c21")}>
-                  <img id="c21" src="" name={this.state.cells.c21} alt="" />
+                  <img id="c21" src="" name="" alt="" />
                 </td>
                 <td onClick={() => this.update_cell("c22")}>
-                  <img id="c22" src="" name={this.state.cells.c22} alt="" />
+                  <img id="c22" src="" name="" alt="" />
                 </td>
                 <td onClick={() => this.update_cell("c23")}>
-                  <img id="c23" src="" name={this.state.cells.c23} alt="" />
+                  <img id="c23" src="" name="" alt="" />
                 </td>
               </tr>
               <tr>
                 <td onClick={() => this.update_cell("c31")}>
-                  <img id="c31" src="" name={this.state.cells.c31} alt="" />
+                  <img id="c31" src="" name="" alt="" />
                 </td>
                 <td onClick={() => this.update_cell("c32")}>
-                  <img id="c32" src="" name={this.state.cells.c32} alt="" />
+                  <img id="c32" src="" name="" alt="" />
                 </td>
                 <td onClick={() => this.update_cell("c33")}>
-                  <img id="c33" src="" name={this.state.cells.c33} alt="" />
+                  <img id="c33" src="" name="" alt="" />
                 </td>
               </tr>
             </tbody>
@@ -100,33 +89,23 @@ class TableComp extends Component {
     const winnerBanner = document.getElementById("winnerBanner");
     winnerBanner.removeAttribute("hidden");
 
-    this.setState({
-      player: startingPlayer,
-    });
+    this.player = startingPlayer;
+    this.changeColor();
   };
 
-  //reset doesnot work
   resetTable = () => {
-    this.setState(this.initialState);
-    const cells = [
-      "c11",
-      "c12",
-      "c13",
-      "c21",
-      "c22",
-      "c23",
-      "c31",
-      "c32",
-      "c33",
-    ];
-    for (let i = 0; i < 9; i++) {
-      const cell = document.getElementById(cells[i]);
-      cell.setAttribute("src", "");
-      // cell.setAttribute("name", this.state.cells[cells[i]]);
+    const gameTable = document.getElementById("gameTable");
+    for (let row of gameTable.rows) {
+      for (let cell of row.cells) {
+        cell.firstChild.setAttribute("src", "");
+        cell.firstChild.setAttribute("name", "");
+      }
     }
   };
 
   fullReset = () => {
+    this.player = "";
+    this.winner = "";
     this.resetTable();
     const chooseSign = document.getElementById("chooseSign");
     chooseSign.removeAttribute("hidden");
@@ -138,27 +117,37 @@ class TableComp extends Component {
     resetBtn.setAttribute("hidden", true);
     const winnerBanner = document.getElementById("winnerBanner");
     winnerBanner.setAttribute("hidden", true);
+    this.changeColor();
   };
 
   update_cell = (cell_id) => {
-    if (this.state.winner !== "") return;
+    if (this.winner !== "") return;
     const cell = document.getElementById(cell_id);
     if (cell.getAttribute("name") !== "") return;
-    this.setMark(cell, this.state.player);
+    this.setMark(cell, this.player);
     this.getResult();
-    this.changePlayer(this.state.player);
+    this.changePlayer(this.player);
   };
 
   changePlayer = (player) => {
-    if (player === "Circle") {
-      this.setState({
-        player: "Cross",
-      });
-    } else if (player === "Cross") {
-      this.setState({
-        player: "Circle",
-      });
-    }
+    if (player === "Circle") this.player = "Cross";
+    else if (player === "Cross") this.player = "Circle";
+
+    this.changeColor();
+  };
+
+  changeColor = () => {
+    let player, color;
+    if (this.winner === "") player = this.player;
+    else player = this.winner;
+
+    if (player === "Circle") color = CircleColor;
+    else if (player === "Cross") color = CrossColor;
+    else if (player === "Draw") color = DrawColor;
+
+    document.querySelector(
+      "body"
+    ).style.cssText = `background-color: ${color};`;
   };
 
   setMark = (cell, player) => {
@@ -168,7 +157,7 @@ class TableComp extends Component {
   };
 
   getResult = () => {
-    const curr_player = this.state.player,
+    const curr_player = this.player,
       c11 = document.getElementById("c11").getAttribute("name"),
       c12 = document.getElementById("c12").getAttribute("name"),
       c13 = document.getElementById("c13").getAttribute("name"),
@@ -189,15 +178,26 @@ class TableComp extends Component {
       (c11 === c22 && c22 === c33 && c11 !== "") ||
       (c13 === c22 && c22 === c31 && c13 !== "")
     ) {
-      this.setState({
-        winner: curr_player,
-      });
+      this.winner = curr_player;
       const winnerBanner = document.getElementById("winnerBanner");
-      winnerBanner.innerText = `Winner is ${curr_player}`;
+      winnerBanner.innerText = `Congratulations ${this.winner}. You WON!`;
+      this.changeColor();
+    } else if (
+      c11 !== "" &&
+      c12 !== "" &&
+      c13 !== "" &&
+      c21 !== "" &&
+      c22 !== "" &&
+      c23 !== "" &&
+      c31 !== "" &&
+      c32 !== "" &&
+      c33 !== ""
+    ) {
+      this.winner = "Draw";
+      const winnerBanner = document.getElementById("winnerBanner");
+      winnerBanner.innerText = "It's a DRAW!";
+      this.changeColor();
     }
-
-    // if (c11 !== "" && c12 !== "" && c13 !== "" && c21 !== "" && c22 !== "" && c23 !== "" && c31 !== "" && c32 !== "" && c33 !== "") {
-    // }
   };
 }
 
