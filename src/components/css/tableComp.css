@@ -1,0 +1,30 @@
+.submitBtn, #gameTable, .resetBtn{
+  margin: auto;
+  text-align: center;
+}
+
+td{
+  width: 110px;
+  height: 110px;
+}
+
+#submitBtn, #resetBtn{
+  margin-bottom: 20px;
+  width: 100px;
+  height: 30px;
+  font-size: 18px;
+}
+
+#resetBtn{
+  margin-top: 20px;
+}
+
+#winnerBanner{
+  text-align: center;
+  font-size: large;
+  font-weight: bold;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+

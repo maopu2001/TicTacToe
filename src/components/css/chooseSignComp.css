@@ -1,0 +1,28 @@
+#chooseSignHeader{
+  
+}
+
+#chooseSign{
+  margin: 30px;
+  text-align: center;
+}
+
+#chooseSignRadio{
+  width:100%;
+  margin: auto;
+  text-align: center;
+}
+
+#Circle, #Cross{
+  padding-top: 5px;
+  margin: 10px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+#CircleLabel, #CrossLabel{
+  font-size: 20px;
+  margin-right: 40px;
+  cursor: pointer;
+}
