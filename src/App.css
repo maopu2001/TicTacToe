@@ -1,4 +1,8 @@
 #headline{
   text-align: center;
-  font-size:50px
+  font-weight:bold;
+  font-size:5rem;
+  background: linear-gradient(blue , red );
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

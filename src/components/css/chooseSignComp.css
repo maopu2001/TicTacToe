@@ -1,9 +1,12 @@
 #chooseSignHeader{
-  
+  font-size: 2rem;
+  background: linear-gradient(90deg, lightskyblue , lightcoral );
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 #chooseSign{
-  margin: 30px;
+  margin-bottom: 2.4rem;
   text-align: center;
 }
 
@@ -14,15 +17,23 @@
 }
 
 #Circle, #Cross{
-  padding-top: 5px;
-  margin: 10px;
-  width: 20px;
-  height: 20px;
+  padding-top: 0.1rem;
+  margin: 0.5rem;
+  width: 1.4rem;
+  height: 1.4rem;
   cursor: pointer;
 }
 
+#CrossLabel{
+  color: lightskyblue;
+}
+
+#CircleLabel{
+  color: lightcoral;
+}
+
 #CircleLabel, #CrossLabel{
-  font-size: 20px;
-  margin-right: 40px;
+  font-size: 1.4rem;
+  margin-right: 2rem;
   cursor: pointer;
 }

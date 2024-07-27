@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import "./css/tableComp.css";
-import Circle from "./png/circle.png";
-import Cross from "./png/cross.png";
+import Circle from "./images/circle.png";
+import Cross from "./images/cross.png";
 import { startingPlayer } from "./chooseSignComp.js";
 
-const CircleColor = "#f7a5a6";
-const CrossColor = "#85c0ea";
-const DrawColor = "#c7c7c7";
+const CircleColor = ["#f7a5a6", "red"];
+const CrossColor = ["#85c0ea", "blue"];
+const DrawColor = ["#c7c7c7", "grey"];
+
+const blinkAnimation = "animation: blink 0.5s 3";
 
 class TableComp extends Component {
   constructor(props) {
@@ -72,6 +74,7 @@ class TableComp extends Component {
     );
   }
 
+  // Set the Staring Player
   setStaringPlayer = () => {
     if (startingPlayer !== "Circle" && startingPlayer !== "Cross") {
       alert("Please Select a Marker");
@@ -86,23 +89,24 @@ class TableComp extends Component {
     gameTable.removeAttribute("hidden");
     const resetBtn = document.getElementById("resetBtn");
     resetBtn.removeAttribute("hidden");
-    const winnerBanner = document.getElementById("winnerBanner");
-    winnerBanner.removeAttribute("hidden");
 
     this.player = startingPlayer;
     this.changeColor();
   };
 
+  // this will reset the gameTable
   resetTable = () => {
     const gameTable = document.getElementById("gameTable");
     for (let row of gameTable.rows) {
       for (let cell of row.cells) {
         cell.firstChild.setAttribute("src", "");
         cell.firstChild.setAttribute("name", "");
+        cell.firstChild.removeAttribute("style");
       }
     }
   };
 
+  //this will reset the whole webapp
   fullReset = () => {
     this.player = "";
     this.winner = "";
@@ -116,10 +120,12 @@ class TableComp extends Component {
     const resetBtn = document.getElementById("resetBtn");
     resetBtn.setAttribute("hidden", true);
     const winnerBanner = document.getElementById("winnerBanner");
+    winnerBanner.innerText = "";
     winnerBanner.setAttribute("hidden", true);
     this.changeColor();
   };
 
+  //this will update any cell which is clicked and change the background based on current player
   update_cell = (cell_id) => {
     if (this.winner !== "") return;
     const cell = document.getElementById(cell_id);
@@ -129,6 +135,7 @@ class TableComp extends Component {
     this.changePlayer(this.player);
   };
 
+  //this will change the player after each step
   changePlayer = (player) => {
     if (player === "Circle") this.player = "Cross";
     else if (player === "Cross") this.player = "Circle";
@@ -136,68 +143,93 @@ class TableComp extends Component {
     this.changeColor();
   };
 
+  // this will change the background color after each step
   changeColor = () => {
-    let player, color;
+    let player, color, winnerBannerColor;
     if (this.winner === "") player = this.player;
     else player = this.winner;
 
-    if (player === "Circle") color = CircleColor;
-    else if (player === "Cross") color = CrossColor;
-    else if (player === "Draw") color = DrawColor;
+    if (player === "Circle") {
+      color = CircleColor[0];
+      winnerBannerColor = CircleColor[1];
+    } else if (player === "Cross") {
+      color = CrossColor[0];
+      winnerBannerColor = CrossColor[1];
+    } else if (player === "Draw") {
+      color = DrawColor[0];
+      winnerBannerColor = DrawColor[1];
+    }
 
     document.querySelector(
       "body"
     ).style.cssText = `background-color: ${color};`;
+
+    const winnerBanner = document.getElementById("winnerBanner");
+    winnerBanner.style.cssText = `background-color: ${winnerBannerColor};`;
   };
 
+  // this will set the marker according to the current player
   setMark = (cell, player) => {
     cell.setAttribute("name", player);
     if (player === "Circle") cell.setAttribute("src", Circle);
     else if (player === "Cross") cell.setAttribute("src", Cross);
   };
 
+  // this will find among all the winning combination and check winner and animate the gameTable
   getResult = () => {
-    const curr_player = this.player,
-      c11 = document.getElementById("c11").getAttribute("name"),
-      c12 = document.getElementById("c12").getAttribute("name"),
-      c13 = document.getElementById("c13").getAttribute("name"),
-      c21 = document.getElementById("c21").getAttribute("name"),
-      c22 = document.getElementById("c22").getAttribute("name"),
-      c23 = document.getElementById("c23").getAttribute("name"),
-      c31 = document.getElementById("c31").getAttribute("name"),
-      c32 = document.getElementById("c32").getAttribute("name"),
-      c33 = document.getElementById("c33").getAttribute("name");
+    const cellCombination = [
+      ["c11", "c12", "c13"],
+      ["c21", "c22", "c23"],
+      ["c31", "c32", "c33"],
+      ["c11", "c21", "c31"],
+      ["c12", "c22", "c32"],
+      ["c13", "c23", "c33"],
+      ["c11", "c22", "c33"],
+      ["c13", "c22", "c31"],
+    ];
 
-    if (
-      (c11 === c12 && c12 === c13 && c11 !== "") ||
-      (c21 === c22 && c22 === c23 && c21 !== "") ||
-      (c31 === c32 && c32 === c33 && c31 !== "") ||
-      (c11 === c21 && c21 === c31 && c11 !== "") ||
-      (c12 === c22 && c22 === c32 && c12 !== "") ||
-      (c13 === c23 && c23 === c33 && c13 !== "") ||
-      (c11 === c22 && c22 === c33 && c11 !== "") ||
-      (c13 === c22 && c22 === c31 && c13 !== "")
-    ) {
-      this.winner = curr_player;
-      const winnerBanner = document.getElementById("winnerBanner");
-      winnerBanner.innerText = `Congratulations ${this.winner}. You WON!`;
-      this.changeColor();
-    } else if (
-      c11 !== "" &&
-      c12 !== "" &&
-      c13 !== "" &&
-      c21 !== "" &&
-      c22 !== "" &&
-      c23 !== "" &&
-      c31 !== "" &&
-      c32 !== "" &&
-      c33 !== ""
-    ) {
-      this.winner = "Draw";
-      const winnerBanner = document.getElementById("winnerBanner");
-      winnerBanner.innerText = "It's a DRAW!";
-      this.changeColor();
+    // checking if there is any winner
+    for (let combination of cellCombination) {
+      const [a, b, c] = combination;
+      const cells = [
+        document.getElementById(a),
+        document.getElementById(b),
+        document.getElementById(c),
+      ];
+      if (
+        cells[0].getAttribute("name") === cells[1].getAttribute("name") &&
+        cells[1].getAttribute("name") === cells[2].getAttribute("name") &&
+        cells[0].getAttribute("name") !== ""
+      ) {
+        this.winner = this.player;
+        const winnerBanner = document.getElementById("winnerBanner");
+        winnerBanner.removeAttribute("hidden");
+        winnerBanner.innerText =
+          `Congratulations ${String(this.winner).toUpperCase()}.` +
+          "\n" +
+          `YOU ARE THE WINNER!`;
+        winnerBanner.style.cssText = `background-color: ${this.winner};`;
+        this.changeColor();
+        for (let cell of cells) {
+          cell.style.cssText = blinkAnimation;
+        }
+        return;
+      }
     }
+
+    //checking if there is a draw\
+    const gameTable = document.getElementById("gameTable");
+    for (let row of gameTable.rows) {
+      for (let cell of row.cells) {
+        if (cell.firstChild.getAttribute("name") === "") return; //Not draw
+      }
+    }
+    //Draw
+    this.winner = "Draw";
+    const winnerBanner = document.getElementById("winnerBanner");
+    winnerBanner.removeAttribute("hidden");
+    winnerBanner.innerText = "It's a DRAW!";
+    this.changeColor();
   };
 }
 
